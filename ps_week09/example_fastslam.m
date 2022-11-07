@@ -37,13 +37,14 @@ mean_pose_y = x_p(2);
 z1 = 2; R1 = 1;
 H = [1 0 0];
 z_sample = H*pose1;
+n = size(pose1, 2);
 p = zeros(n,1);
 for ii=1:n
     p(ii) = mvnpdf(z_sample(ii), z1, R1);
 end
-% p = TODO
 
 % update weight
+weight = 1/n.*ones(n,1);
 weight = weight.*p;
 
 %% (b) observation all measurements #1,2 and 3
@@ -63,15 +64,19 @@ H = [1 0 0;
 z = [z1; z2; z3];
 R = diag([R1,R2,R3]);
 
+z_sample = H*pose1;
+n = size(pose1, 2);
 p = zeros(n,1);
 % p = TODO
 for ii=1:n
-    p(ii) = mvnpdf(z_sample(ii),z,R);
+    p(ii) = mvnpdf(z_sample(:, ii),z,R);
 end
 
 % update weight
+weight = 1/n.*ones(n,1);
 weight = weight.*p;
 
 %% (c) what is the best so far?
-pose_best = TODO
+[~, idx] = max(weight);
+pose_best = pose1(:,idx);
 plot (pose_best(1), pose_best(2), 'k*'); grid on; axis([-0.5,3,-0.5,5]);
